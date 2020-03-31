@@ -1,19 +1,16 @@
 apiVersion: apiregistration.k8s.io/v1beta1
 kind: APIService
 metadata:
-  name: v1alpha1.{{ .Values.groupName }}
+  name: v1alpha1.acme.volfoni.org
   labels:
-    app: {{ include "cert-manager-webhook-gandi.name" . }}
-    chart: {{ include "cert-manager-webhook-gandi.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: cert-manager-webhook-gandi
   annotations:
-    cert-manager.io/inject-ca-from: "{{ .Release.Namespace }}/{{ include "cert-manager-webhook-gandi.servingCertificate" . }}"
+    cert-manager.io/inject-ca-from: "cert-manager/cert-manager-webhook-gandi-webhook-tls"
 spec:
-  group: {{ .Values.groupName }}
+  group: acme.volfoni.org
   groupPriorityMinimum: 1000
   versionPriority: 15
   service:
-    name: {{ include "cert-manager-webhook-gandi.fullname" . }}
-    namespace: {{ .Release.Namespace }}
+    name: cert-manager-webhook-gandi
+    namespace: cert-manager
   version: v1alpha1
