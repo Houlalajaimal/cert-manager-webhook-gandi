@@ -1,12 +1,9 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "cert-manager-webhook-gandi.fullname" . }}
+  name: cert-manager-webhook-gandi
   labels:
-    app: {{ include "cert-manager-webhook-gandi.name" . }}
-    chart: {{ include "cert-manager-webhook-gandi.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: cert-manager-webhook-gandi
 ---
 # Grant the webhook permission to read the ConfigMap containing the Kubernetes
 # apiserver's requestheader-ca-certificate.
@@ -14,13 +11,10 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "cert-manager-webhook-gandi.fullname" . }}:webhook-authentication-reader
+  name: cert-manager-webhook-gandi:webhook-authentication-reader
   namespace: kube-system
   labels:
-    app: {{ include "cert-manager-webhook-gandi.name" . }}
-    chart: {{ include "cert-manager-webhook-gandi.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: cert-manager-webhook-gandi
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -28,20 +22,17 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "cert-manager-webhook-gandi.fullname" . }}
-    namespace: {{ .Release.Namespace }}
+    name: cert-manager-webhook-gandi
+    namespace: default
 ---
 # apiserver gets the auth-delegator role to delegate auth decisions to
 # the core apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "cert-manager-webhook-gandi.fullname" . }}:auth-delegator
+  name: cert-manager-webhook-gandi:auth-delegator
   labels:
-    app: {{ include "cert-manager-webhook-gandi.name" . }}
-    chart: {{ include "cert-manager-webhook-gandi.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: cert-manager-webhook-gandi
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -49,22 +40,19 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "cert-manager-webhook-gandi.fullname" . }}
-    namespace: {{ .Release.Namespace }}
+    name: cert-manager-webhook-gandi
+    namespace: default
 ---
 # Grant cert-manager permission to validate using our apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "cert-manager-webhook-gandi.fullname" . }}:domain-solver
+  name: cert-manager-webhook-gandi:domain-solver
   labels:
-    app: {{ include "cert-manager-webhook-gandi.name" . }}
-    chart: {{ include "cert-manager-webhook-gandi.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: cert-manager-webhook-gandi
 rules:
   - apiGroups:
-      - {{ .Values.groupName }}
+      - acme.volfoni.org
     resources:
       - '*'
     verbs:
@@ -73,18 +61,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "cert-manager-webhook-gandi.fullname" . }}:domain-solver
+  name: cert-manager-webhook-gandi:domain-solver
   labels:
-    app: {{ include "cert-manager-webhook-gandi.name" . }}
-    chart: {{ include "cert-manager-webhook-gandi.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: cert-manager-webhook-gandi
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "cert-manager-webhook-gandi.fullname" . }}:domain-solver
+  name: cert-manager-webhook-gandi:domain-solver
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ .Values.certManager.serviceAccountName }}
-    namespace: {{ .Values.certManager.namespace }}
+    name: cert-manager
+    namespace: cert-manager
